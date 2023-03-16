@@ -1,3 +1,4 @@
+
 /*****************************************************************/
 /***********		Author: Ahmed Mohamed 			**************/
 /***********		Layer: HAL			 			**************/
@@ -10,35 +11,43 @@
 #ifndef CLCD_CONFIG_H_
 #define CLCD_CONFIG_H_
 
-#define CLCD_DATA_PORT			DIO_u8PORTA
+/* LCD Data bits mode configuration, its value should be 4 or 8*/
+#define CLCD_DATA_BITS_MODE  4
 
-#define CLCD_MSPORT				DISABLED
+#define CLCD_SIZE_OF_ARRAY			10
 
-#define CLCD_CTRL_PORT			DIO_u8PORTC
-#define CLCD_RS_PIN				DIO_u8PIN0
-#define CLCD_RW_PIN				DIO_u8PIN1
-#define CLCD_E_PIN				DIO_u8PIN2
 
-/*Choose :   1- _4_BIT
-             2- _8_BIT
-*/
-#define CLCD_MODE			    _4_BIT
+/* LCD HW Ports and Pins Ids */
+#define CLCD_CTRL_PORT               DIO_u8PORTC
 
-/*Choose :   1- _1_LINE_DISPLAY
-             2- _2_LINE_DISPLAY
-*/
-#define CLCD_LINE			    _2_LINE_DISPLAY
+#define CLCD_RS_PIN                  DIO_u8PIN0
+#define CLCD_RW_PIN                  DIO_u8PIN1
+#define CLCD_E_PIN                   DIO_u8PIN2
 
-/*Choose :   1- _5_7_FONT_DISPLAY
-             2- _5_10_FONT_DISPLAY                   * To choose this mode , you must select  _1_LINE_DISPLAY
-*/
-#define CLCD_FONT				_5_7_FONT_DISPLAY
+#define CLCD_DATA_PORT               DIO_u8PORTC
 
-/*Choose :   1- ENABLED
-             2- DISABLED
-*/
-#define CLCD_DISPLAY			ENABLED
-#define CLCD_CURSOR				DISABLED
-#define CLCD_BLINK_CURSOR		DISABLED
+#define CLCD_D4_PIN                 DIO_u8PIN3
+#define CLCD_D5_PIN                 DIO_u8PIN4
+#define CLCD_D6_PIN                 DIO_u8PIN5
+#define CLCD_D7_PIN                 DIO_u8PIN6
+
+//	Vss = GND
+//	Vdd=5v
+//	V0= pot to view
+//	A=5v
+//	K=GND
+
+/* LCD Commands */
+
+#define LCD_CLEAR_COMMAND                    0x01
+#define LCD_GO_TO_HOME                       0x02
+#define LCD_TWO_LINES_EIGHT_BITS_MODE        0x38
+#define LCD_TWO_LINES_FOUR_BITS_MODE         0x28
+#define LCD_TWO_LINES_FOUR_BITS_MODE_INIT1   0x33
+#define LCD_TWO_LINES_FOUR_BITS_MODE_INIT2   0x32
+#define LCD_CURSOR_OFF                       0x0C
+#define LCD_CURSOR_ON                        0x0E
+#define LCD_SET_CURSOR_LOCATION              0x80
 
 #endif
+

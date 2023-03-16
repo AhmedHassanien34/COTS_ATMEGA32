@@ -9,6 +9,7 @@
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
 
+#include "DIO_interface.h"
 #include "SPI_interface.h"
 #include "SPI_config.h"
 #include "SPI_private.h"
@@ -18,6 +19,10 @@ static void (*SPI_ISR) (void)= NULL;
 
 void SPI_voidInitMaster(void)
 {
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN5 ,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN6 ,DIO_u8PIN_INPUT);
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN7 ,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN4 ,DIO_u8PIN_OUTPUT);
 	/*Data Order By Default*/
 
 	/*Master Initialization*/
@@ -38,6 +43,10 @@ void SPI_voidInitMaster(void)
 
 void SPI_voidInitSlave(void)
 {
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN5 ,DIO_u8PIN_INPUT);
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN6 ,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN7 ,DIO_u8PIN_INPUT);
+	DIO_u8SetPinDirection(DIO_u8PORTB , DIO_u8PIN4 ,DIO_u8PIN_INPUT);
 	/*Data Order By Default*/
 
 	/*Slave Initialization*/
@@ -49,6 +58,17 @@ void SPI_voidInitSlave(void)
 
 	/*SPI Enable*/
 	SET_BIT(SPCR,SPCR_SPE);
+}
+
+void SPI_voidTransferByte(u8 Copy_u8Data) {
+	SPDR = Copy_u8Data;
+	while(GET_BIT(SPSR,SPSR_SPIF) == 0);		/* wait here while SPIF flag set */
+}
+
+
+u8 SPI_u8ReceiveByte(void) {
+	while(GET_BIT(SPSR,SPSR_SPIF) == 0);
+	return SPDR;
 }
 
 u8 SPI_u8Transceive(u8 Copy_u8Data)
@@ -67,25 +87,21 @@ u8 SPI_u8Transceive(u8 Copy_u8Data)
 
 void SPI_voidEnableInterrupt(void)
 {
-	SET_BIT(SPCR , SPIE);
+	SET_BIT(SPCR ,SPCR_SPIE);
 }
 void SPI_voidDisableInterrupt(void)
 {
-	CLR_BIT(SPCR , SPIE);
+	CLR_BIT(SPCR , SPCR_SPIE);
 }
 void SPI_voidSetCallBack(void (*PtrToSPI_ISR)(void))
 {
 	SPI_ISR = PtrToSPI_ISR;
 }
-
+/*
 void __vector_10(void) __attribute__((signal , used));
 void __vector_10(void)
 {
 	SPI_ISR();
 }
 
-ISR(SPI_STC_vect)
-{
-	
-	SPI_ISR();
-}
+*/

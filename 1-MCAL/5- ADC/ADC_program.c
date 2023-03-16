@@ -145,7 +145,7 @@ u8 ADC_u8StartConversionSynch(u8 Copy_u8Channel, u8* Copy_pu8Reading)
 	}
 	else
 	{
-		Local_u8ErrorState= BUSY_FUNC;
+		Local_u8ErrorState= BUSY;
 	}
 
 	return Local_u8ErrorState;
@@ -190,7 +190,7 @@ u8 ADC_u8StartConversionAsynch(u8 Copy_u8Channel, u8* Copy_pu8Reading, void(*Cop
 	}
 	else
 	{
-		Local_uErrorState= BUSY_FUNC;
+		Local_uErrorState= BUSY;
 	}
 
 	return Local_uErrorState;
@@ -212,7 +212,7 @@ u8 ADC_u8StartChainAsynch(Chain_t * Copy_Chain)
 		else
 		{
 			/*ADC is now busy*/
-			Local_u8ErrorState = BUSY_FUNC;
+			Local_u8ErrorState = BUSY;
 
 			/*MakIe ISR Source: Single channel asynchronous*/
 			ADC_u8ISRSource = ChainAsynch;

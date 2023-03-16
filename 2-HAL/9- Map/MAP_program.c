@@ -10,7 +10,6 @@
 #include "BIT_MATH.h"
 #include "STD_TYPES.h"
 
-#include "PORT_interface.h"
 #include "DIO_interface.h"
 
 #include "MAP_config.h"

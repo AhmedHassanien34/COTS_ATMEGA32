@@ -15,6 +15,9 @@
 #define GICR_INT2		5
 
 #define GIFR		 	*((volatile u8*)0x5A)
+#define GIFR_INTF0 6
+#define GIFR_INTF1 7
+#define GIFR_INTF2 5
 
 #define MCUCR		 	*((volatile u8*)0x55)
 #define MCUCR_ISC11		3

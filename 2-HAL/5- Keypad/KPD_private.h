@@ -10,7 +10,8 @@
 #ifndef KPD_PRIVATE_H_
 #define KPD_PRIVATE_H_
 
-#define COLUMN_NUM			4
-#define ROW_NUM				4
+/* Private Macros for if the button is pressed or not */
+#define KPD_PRESSED_KEY 		0x00
+#define KPD_NO_PRESSED_KEY 		0xff
 
 #endif

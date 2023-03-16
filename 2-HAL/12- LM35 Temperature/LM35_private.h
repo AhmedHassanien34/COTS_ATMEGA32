@@ -1,20 +1,14 @@
 /*****************************************************************/
 /***********		Author: Ahmed Mohamed 			**************/
 /***********		Layer: HAL			 			**************/
-/***********		Component: DC_Motor		 		**************/
+/***********		Component: LM35			 		**************/
 /***********		Version: 1.00		 			**************/
-/***********		Date: 17-12-2022	 			**************/
+/***********		Date: 4-3-2023	 				**************/
 /*****************************************************************/
 
-#ifndef DCM_CONFIG_H_
-#define DCM_CONFIG_H_
-
-#define DCM_PORT				DIO_u8PORTB
-
-#define DCM_PIN0				DIO_u8PIN0
-#define DCM_PIN1				DIO_u8PIN1
-
-#define PWM_PIN					DIO_u8PIN3
+/* Preprocessor file guard */
+#ifndef LM35_PRIVATE_H_
+#define LM35_PRIVATE_H_
 
 
 #endif

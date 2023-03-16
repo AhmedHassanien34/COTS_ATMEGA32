@@ -5,257 +5,132 @@
 /***********		Version: 1.00		 			**************/
 /***********		Date: 17-12-2022	 			**************/
 /*****************************************************************/
-#include "STD_TYPES.h"
-#include "BIT_MATH.h"
 
 #include <util/delay.h>
 
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
 #include "DIO_interface.h"
+
+
 #include "CLCD_interface.h"
 #include "CLCD_config.h"
 #include "CLCD_private.h"
 
-static u8 u8AddressCounter = 0;
 static u8 u8SateSpecialCharIndx = 0;
 
+/*******************************************************************************
+ *                      Functions Definitions                                  *
+ *******************************************************************************/
 
 void CLCD_voidSendCommand(u8 Copy_u8Command)
 {
-#if CLCD_MODE == _8_BIT
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_LOW);
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_LOW); /* Instruction Mode RS=0 */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW); /* Instruction Mode RW=0 */
+	_delay_ms(1); /* delay for processing Tas = 50ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH); /* Enable LCD E=1 */
+	_delay_ms(1); /* delay for processing Tpw - Tdws = 190ns */
 
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
 
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Copy_u8Command);
 
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
+#if (CLCD_DATA_BITS_MODE == 4)
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D4_PIN, GET_BIT(Copy_u8Command, 4));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D5_PIN, GET_BIT(Copy_u8Command, 5));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D6_PIN, GET_BIT(Copy_u8Command, 6));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D7_PIN, GET_BIT(Copy_u8Command, 7));
 
-#elif CLCD_MODE == _4_BIT
+	_delay_ms(1); /* delay for processing Tdsw = 100ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW); /* Disable LCD E=0 */
+	_delay_ms(1); /* delay for processing Th = 13ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH); /* Disable LCD E=1 */
+	_delay_ms(1); /* delay for processing Tpw - Tdws = 190ns */
 
-	u8 Local_u8PortValue = 0;
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D4_PIN, GET_BIT(Copy_u8Command, 0));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D5_PIN, GET_BIT(Copy_u8Command, 1));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D6_PIN, GET_BIT(Copy_u8Command, 2));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D7_PIN, GET_BIT(Copy_u8Command, 3));
 
-#if CLCD_MSPORT == ENABLED
+	_delay_ms(1); /* delay for processing Tdsw = 100ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW); /* Disable LCD E=0 */
+	_delay_ms(1); /* delay for processing Th = 13ns */
 
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_LOW);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0x0f) | (Copy_u8Command & 0xf0));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-	// Second 4_Bits
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_LOW);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0x0f) | (Copy_u8Command << 4));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-#elif CLCD_MSPORT == DISABLED
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_LOW);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0xf0) | (Copy_u8Command >> 4));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-	// Second 4_Bits
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_LOW);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0xf0) | (Copy_u8Command & 0x0f));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-#endif
+#elif(CLCD_DATA_BITS_MODE == 8)
+	DIO_u8SetPortValue(CLCD_DATA_PORT, Copy_u8Command);
+	_delay_ms(1); /* delay for processing Tdsw = 100ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW); /* Disable LCD E=1 */
+	_delay_ms(1); /* delay for processing Th = 13ns */
 #endif
 }
 
 void CLCD_voidSendData(u8 Copy_u8Data)
 {
-	/* check if send data called because of CLCD_voidWriteSpecialCharacter function or not */
-	if(u8SateSpecialCharIndx == 0)
-	{
-		u8AddressCounter++;
-	}
-	/* Check End of first line */
-	if(u8AddressCounter == END_LINE)
-	{
-		/* Start from second line */
-		CLCD_voidSendCommand(0xC0);
-	}
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_HIGH); /* Data Mode RS=1 */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW); /* Instruction Mode RW=0 */
+	_delay_ms(1); /* delay for processing Tas = 50ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH); /* Enable LCD E=1 */
+	_delay_ms(1); /* delay for processing Tpw - Tdws = 190ns */
 
-#if CLCD_MODE == _8_BIT
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_HIGH);
+#if (CLCD_DATA_BITS_MODE == 4)
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D4_PIN, GET_BIT(Copy_u8Data, 4));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D5_PIN, GET_BIT(Copy_u8Data, 5));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D6_PIN, GET_BIT(Copy_u8Data, 6));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D7_PIN, GET_BIT(Copy_u8Data, 7));
+	_delay_ms(1); /* delay for processing Tdsw = 100ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW); /* Disable LCD E=0 */
+	_delay_ms(1); /* delay for processing Th = 13ns */
+	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH); /* Disable LCD E=1 */
+	_delay_ms(1); /* delay for processing Tpw - Tdws = 190ns */
 
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D4_PIN, GET_BIT(Copy_u8Data, 0));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D5_PIN, GET_BIT(Copy_u8Data, 1));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D6_PIN, GET_BIT(Copy_u8Data, 2));
+	DIO_u8SetPinValue(CLCD_DATA_PORT,CLCD_D7_PIN, GET_BIT(Copy_u8Data, 3));
 
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Copy_u8Data);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
+	_delay_ms(1); /* delay for processing Tdsw = 100ns */
 	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-#elif CLCD_MODE == _4_BIT
-
-	u8 Local_u8PortValue = 0;
-
-#if CLCD_MSPORT == ENABLED
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_HIGH);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0x0f) | (Copy_u8Data & 0xf0));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
+	_delay_ms(1); /* delay for processing Th = 13ns */
+#elif(CLCD_DATA_BITS_MODE == 8)
+	DIO_u8SetPortValue(CLCD_DATA_PORT, Copy_U8Data);
+	_delay_ms(1); /* delay for processing Tdsw = 100ns */
 	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-	// Second 4_Bits
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_HIGH);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0x0f) | (Copy_u8Data << 4));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-#elif CLCD_MSPORT == DISABLED
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_HIGH);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0xf0) | (Copy_u8Data >> 4));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-
-	// Second 4_Bits
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RS_PIN , DIO_u8PIN_HIGH);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_RW_PIN , DIO_u8PIN_LOW);
-
-	DIO_u8GetPortValue(CLCD_DATA_PORT , &Local_u8PortValue);
-	Local_u8PortValue = ((Local_u8PortValue & 0xf0) | (Copy_u8Data & 0x0f));
-	DIO_u8SetPortValue(CLCD_DATA_PORT , Local_u8PortValue);
-
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_HIGH);
-	_delay_ms(2);
-	DIO_u8SetPinValue(CLCD_CTRL_PORT , CLCD_E_PIN , DIO_u8PIN_LOW);
-#endif
+	_delay_ms(1); /* delay for processing Th = 13ns */
 #endif
 }
 
 void CLCD_voidInit(void)
 {
-	_delay_ms(40);
-	u8 Local_u8Value = 0;
+	/* Configure the direction for RS , E and RW pins as output pins */
+	DIO_u8SetPinDirection(CLCD_CTRL_PORT,CLCD_RS_PIN,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(CLCD_CTRL_PORT,CLCD_RW_PIN,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(CLCD_CTRL_PORT,CLCD_E_PIN,DIO_u8PIN_OUTPUT);
+	_delay_ms(20);		/* LCD Power ON delay always > 15ms */
 
-#if CLCD_MODE == _8_BIT
+#if (CLCD_DATA_BITS_MODE == 4)
+	/* Configure 4 pins in the data port as output pins */
+	DIO_u8SetPinDirection(CLCD_DATA_PORT,CLCD_D4_PIN,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(CLCD_DATA_PORT,CLCD_D5_PIN,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(CLCD_DATA_PORT,CLCD_D6_PIN,DIO_u8PIN_OUTPUT);
+	DIO_u8SetPinDirection(CLCD_DATA_PORT,CLCD_D7_PIN,DIO_u8PIN_OUTPUT);
 
-	/* configure Function Set command bits */
-	SET_BIT(Local_u8Value , 4);
-	SET_BIT(Local_u8Value , 5);
+	/* Send for 4 bit initialization of LCD  */
+	CLCD_voidSendCommand(LCD_TWO_LINES_FOUR_BITS_MODE_INIT1);
+	CLCD_voidSendCommand(LCD_TWO_LINES_FOUR_BITS_MODE_INIT2);
 
-#if CLCD_LINE == _2_LINE_DISPLAY
-	SET_BIT(Local_u8Value , 3);
-#endif
-#if CLCD_FONT == _5_10_FONT_DISPLAY
-	SET_BIT(Local_u8Value , 2);
-#endif
+	/* use 2-lines LCD + 4-bits Data Mode + 5*7 dot display Mode */
+	CLCD_voidSendCommand(LCD_TWO_LINES_FOUR_BITS_MODE);
 
-	/* Send Function Set Command */
-	CLCD_voidSendCommand(Local_u8Value);
+#elif(CLCD_DATA_BITS_MODE == 8)
 
-	/* Clear Buffer */
-	Local_u8Value = 0;
+	/* Configure the data port as output port */
+	DIO_SetPortDirection(CLCD_DATA_PORT,DIO_u8PORT_OUTPUT);
 
-	/* configure Display Control command bits  */
-	SET_BIT(Local_u8Value , 3);
-
-#if CLCD_DISPLAY == ENABLED
-	SET_BIT(Local_u8Value , 2);
-#endif
-
-#if CLCD_CURSOR == ENABLED
-	SET_BIT(Local_u8Value , 1);
+	/* use 2-lines LCD + 8-bits Data Mode + 5*7 dot display Mode */
+	CLCD_voidSendCommand(TWO_LINE_LCD_Eight_BIT_MODE);
 #endif
 
-#if CLCD_BLINK_CURSOR == ENABLED
-	SET_BIT(Local_u8Value , 0);
-#endif
-
-	/* Send Display Control command  */
-	CLCD_voidSendCommand(Local_u8Value);
-
-	/* Send Display Clear command  */
-	CLCD_voidSendCommand(1);
-#elif CLCD_MODE == _4_BIT
-	/*Init 4-Bit Mode*/
-	CLCD_voidSendCommand(0x33);
-	CLCD_voidSendCommand(0x32);
-
-    /* configure Function Set command bits */
-	SET_BIT(Local_u8Value , 5);
-#if CLCD_LINE == _2_LINE_DISPLAY
-	SET_BIT(Local_u8Value , 3);
-#endif
-#if CLCD_FONT == _5_10_FONT_DISPLAY
-	SET_BIT(Local_u8Value , 2);
-#endif
-	/* Send Function Set Command */
-	CLCD_voidSendCommand(Local_u8Value);
-
-	/* Clear Buffer */
-	Local_u8Value = 0;
-
-	/* configure Display Control command bits  */
-	SET_BIT(Local_u8Value , 3);
-
-#if CLCD_DISPLAY == ENABLED
-	SET_BIT(Local_u8Value , 2);
-#endif
-
-#if CLCD_CURSOR == ENABLED
-	SET_BIT(Local_u8Value , 1);
-#endif
-
-#if CLCD_BLINK_CURSOR == ENABLED
-	SET_BIT(Local_u8Value , 0);
-#endif
-
-	/* Send Display Control command  */
-	CLCD_voidSendCommand(Local_u8Value);
-
-	/* Send Display Clear command  */
-	CLCD_voidSendCommand(1);
-#else
-#endif
+	CLCD_voidSendCommand(LCD_CURSOR_OFF);    /* cursor off */
+	CLCD_voidSendCommand(LCD_CLEAR_COMMAND); /* clear LCD at the beginning */
 }
 
 void CLCD_voidSendString(const char* Copy_pcString)
@@ -270,16 +145,24 @@ void CLCD_voidSendString(const char* Copy_pcString)
 
 void CLCD_voidGoToXY(u8 Copy_u8XPos , u8 Copy_u8YPos)
 {
-	u8 Local_u8Adress;
-	if(Copy_u8XPos == 0)
-	{
-		Local_u8Adress = Copy_u8YPos;
+	switch (Copy_u8XPos) {
+	case 0:
+		CLCD_voidSendCommand(128 + Copy_u8YPos);
+		break;
+	case 1:
+		CLCD_voidSendCommand(192 + Copy_u8YPos);
+		break;
+	case 2:
+		CLCD_voidSendCommand(256 + Copy_u8YPos);
+		break;
+	case 3:
+		CLCD_voidSendCommand(320 + Copy_u8YPos);
+		break;
+	default:
+		//
+		break;
+
 	}
-	else if(Copy_u8XPos == 1)
-	{
-		Local_u8Adress = Copy_u8YPos + 0x40;
-	}
-	CLCD_voidSendCommand(Local_u8Adress + 128);
 }
 
 void CLCD_voidWriteSpecialCharacter(u8* Copy_pu8Pattern , u8 Copy_u8PatternNumber , u8 Copy_u8XPos , u8 Copy_u8YPos)
@@ -316,4 +199,16 @@ void CLCD_voidSendNumber(u32 Copy_u32Number)
 	{
 		CLCD_voidSendData(Array_Number[Local_s8Iterator]);
 	}
+}
+
+void CLCD_voidIntegerToString (u8 Copy_u32Value)	// Display certain integer value on screen
+{
+	u8 number_str[16];
+	itoa(Copy_u32Value, number_str, 10); /* Use itoa C function to convert the data to its corresponding ASCII value, 10 for decimal */
+	CLCD_voidSendString(number_str);
+}
+
+void CLCD_voidClearScreen (void)
+{
+	CLCD_voidSendCommand(LCD_CLEAR_COMMAND);
 }

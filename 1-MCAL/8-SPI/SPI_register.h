@@ -16,6 +16,7 @@
 #define SPSR_SPI2X			0							/*Prescaler bit 2*/
 
 #define SPCR        	    *((volatile u8*)0x2D)		/*SPI Control register*/
+#define SPCR_SPIE			7
 #define SPCR_SPE			6							/*SPI Enable*/
 #define SPCR_MASTR			4							/*Master bit*/
 #define SPCR_SPR1			1							/*Prescaler bit 1*/

@@ -1,22 +1,13 @@
 /**************************************************************************************/
 /********************			Author: Ahmed Mohamed			***********************/
-/********************			Layer: MCAL			 			***********************/
-/********************			Component: EXTI				    ***********************/
+/********************			Layer: HAL			 			***********************/
+/********************			Component: Ultrasonic 		    ***********************/
 /********************			Version: 1.00		 			***********************/
 /********************			Date: 16-12-2022	 			***********************/
 /**************************************************************************************/
 
-#ifndef EXTI_PRIVATE_H_
-#define EXTI_PRIVATE_H_
-
-#define LOW_LEVEL		1
-#define ON_CHANGE		2
-#define FALLING_EDGE	3
-#define RISING_EDGE		4
-
-
-#define ENABLED			1
-#define DISABLED		2
+#ifndef ULTRASONIC_PRIVATE_H
+#define ULTRASONIC_PRIVATE_H
 
 
 

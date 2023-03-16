@@ -2,8 +2,8 @@
 /***********		Author: Ahmed Mohamed 			**************/
 /***********		Layer: MCAL			 			**************/
 /***********		Component: UART			 		**************/
-/***********		Version: 1.00		 			**************/
-/***********		Date: 17-12-2022	 			**************/
+/***********		Version: 2.00		 			**************/
+/***********		Date: 29-1-2023		 			**************/
 /*****************************************************************/
 
 
@@ -13,12 +13,18 @@
 #define UDR					*((volatile u8*)0x2C) 			//USART I/O Data Register
 
 #define UCSRA 					*((volatile u8*)0x2B)		//USART Control and Status Register A
+#define UCSRA_MPCM              0
 #define UCSRA_U2X				1							//Double the USART Transmission Speed
+#define UCSRA_PE				2
+#define UUCSRA_DOR 				3
+#define UCSRA_FE                4
 #define UCSRA_UDRE				5							//USART Data Register Empty
 #define UCSRA_TXC				6							//Transmit Complete
 #define UCSRA_RXC				7							//USART Receive Complete
 
 #define UCSRB					*((volatile u8*)0x2A)		//USART Control and Status Register B
+#define UCSRB_TXB8              0
+#define UCSRB_RXB8              1
 #define UCSRB_UCSZ2				2							//UCSZ2: Character Size
 #define UCSRB_TXEN				3							//Transmitter Enable
 #define UCSRB_RXEN				4							//Receiver Enable
@@ -36,6 +42,7 @@
 #define UCSRC_UMSEL				6							//USART Mode Select
 #define UCSRC_URSEL				7							//Register Select :UBRRH - UCSRC
 
+#define UBRRH                   *((volatile u8*)0x40)
 #define UBRRL					*((volatile u8*)0x29)		//USART Baud Rate Registers UBRRL
 
 

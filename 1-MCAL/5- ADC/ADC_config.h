@@ -22,7 +22,7 @@
 /*Choose : 1- _8_bits
  	 	   2- _10_bits
  */
-#define Resolution					_8_Bits
+#define Resolution					_10_Bits
 
 
 /*ADC Prescaler Select Bits*/
@@ -34,7 +34,7 @@
  	 	   6-DivisionBy64
  	 	   7-DivisionBy128
  */
-#define PrescalerSelections			DivisionBy128
+#define PrescalerSelections			DivisionBy8
 
 
 #define ADC_u32TIMEOUT		50000

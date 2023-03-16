@@ -1,22 +1,21 @@
 /**************************************************************************************/
 /********************			Author: Ahmed Mohamed			***********************/
-/********************			Layer: MCAL			 			***********************/
-/********************			Component: EXTI				    ***********************/
+/********************			Layer: HAL			 			***********************/
+/********************			Component: Servo Motor 		    ***********************/
 /********************			Version: 1.00		 			***********************/
 /********************			Date: 16-12-2022	 			***********************/
 /**************************************************************************************/
 
-#ifndef EXTI_PRIVATE_H_
-#define EXTI_PRIVATE_H_
-
-#define LOW_LEVEL		1
-#define ON_CHANGE		2
-#define FALLING_EDGE	3
-#define RISING_EDGE		4
+#ifndef SvM_INTERFACE_H
+#define SvM_INTERFACE_H
 
 
-#define ENABLED			1
-#define DISABLED		2
+
+void SERVO_voidTimer1InitOCR1A(void);
+void SERVO_voidTimer1InitOCR1B(void);
+void SERVO_voidTimer1ServoSetAngleOCR1A(u32 copy_u32Angle);
+void SERVO_voidTimer1ServoSetAngleOCR1B(u32 copy_u32Angle);
+
 
 
 

@@ -23,6 +23,7 @@ void (*EXTI_pvInt2Func)(void)=NULL;
 
 void EXTI_voidInt0Init(void)
 {
+	DIO_u8SetPinDirection(DIO_u8PORTD,DIO_u8PIN2,DIO_u8PIN_INPULLUP)
 	/*1- Check Sense control*/
 #if INT0_SENSE == LOW_LEVEL
 	CLR_BIT(MCUCR,MCUCR_ISC00);
@@ -57,6 +58,8 @@ void EXTI_voidInt0Init(void)
 
 void EXTI_voidInt1Init(void)
 {
+	DIO_u8SetPinDirection(DIO_u8PORTD,DIO_u8PIN3,DIO_u8PIN_INPULLUP)
+	
 #if INT1_SENSE == LOW_LEVEL
 	CLR_BIT(MCUCR,MCUCR_ISC10);
 	CLR_BIT(MCUCR,MCUCR_ISC11);
@@ -90,6 +93,8 @@ void EXTI_voidInt1Init(void)
 
 void EXTI_voidInt2Init(void)
 {
+	DIO_u8SetPinDirection(DIO_u8PORTB,DIO_u8PIN2,DIO_u8PIN_INPULLUP)
+	
 #if INT2_SENSE == FALLING_EDGE
 	CLR_BIT(MCUCSR,MCUCSR_INT2);
 

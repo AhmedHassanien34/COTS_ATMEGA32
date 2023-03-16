@@ -11,19 +11,6 @@
 #ifndef LCD_INTERFACE_H_
 #define LCD_INTERFACE_H_
 
-#define NULL					0
-
-#define CLCD_u8NUMBER0			0
-#define CLCD_u8NUMBER1			1
-#define CLCD_u8NUMBER2			2
-#define CLCD_u8NUMBER3			3
-#define CLCD_u8NUMBER4			4
-#define CLCD_u8NUMBER5			5
-#define CLCD_u8NUMBER6			6
-#define CLCD_u8NUMBER7			7
-#define CLCD_u8NUMBER8			8
-#define CLCD_u8NUMBER9			9
-
 // initiate LCD (must be called before using LCD functions)
 void CLCD_voidInit(void);
 
@@ -31,7 +18,7 @@ void CLCD_voidInit(void);
 void CLCD_voidSendCommand(u8 copy_u8Command);
 
 // print character On LCD
-void CLCD_voidSendCharacter(u8 copy_u8Character);
+void CLCD_voidSendData(u8 Copy_u8Data);
 
 // Send string to LCD (input argument is a pointer to the beginning of the string)
 void CLCD_voidSendString(const char* Copy_pcString);
@@ -44,6 +31,11 @@ void CLCD_voidWriteSpecialCharacter(u8* Copy_pu8Pattern , u8 Copy_u8PatternNumbe
 
 // Write number
 void CLCD_voidSendNumber(u32 Copy_u32Number);
+
+void CLCD_voidIntegerToString(u8 Copy_u32Value);
+
+// Clear LCD
+void CLCD_voidClearScreen (void);
 
 
 // LCD_voidWriteNum Overflow
