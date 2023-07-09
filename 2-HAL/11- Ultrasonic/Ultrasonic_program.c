@@ -51,14 +51,13 @@ void ULTRASONIC_voidInit(void)
 void ULTRASONIC_voidTrigger(void)
 {
 	DIO_u8SetPinValue(ULTRASONIC_TRIGGER_PORT,ULTRASONIC_TRIGGER_PIN,DIO_u8PIN_HIGH);
-	_delay_us(10);
+	_delay_us(15);
 	DIO_u8SetPinValue(ULTRASONIC_TRIGGER_PORT,ULTRASONIC_TRIGGER_PIN,DIO_u8PIN_LOW);
 }
 u16 ULTRASONIC_u16GetDistance(void)
 {
 	u16 Local_u16Distance;
-	for (u8 Local_u8Couter=0;Local_u8Couter<16;Local_u8Couter++)
-	{
+
 		 ULTRASONIC_voidTrigger();
 		 /* HC-SR-04 */
 		 /* Sound velocity = 340.00 m/s = 34000 cm/s
@@ -68,8 +67,8 @@ u16 ULTRASONIC_u16GetDistance(void)
 		  * Distance (cm)= 17000 x (TIMER value) x 1 x 10^-6 cm
 	      * Distance (cm)= (TIMER value) / 58 cm
 	      * */
-	     Local_u16Distance=(ULTRASONIC_u16TimeON/(57.828125)); /* Calculating Distance In cm */
-	}
+	     Local_u16Distance=(ULTRASONIC_u16TimeON/(58)+1); /* Calculating Distance In cm */
+
 	return Local_u16Distance;
 }
 
